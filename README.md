@@ -5,6 +5,12 @@ Press the accelerator to start the race with three computer-controlled rivals.
 Drive clockwise, steer around blueberries and sugar cubes, and cross the marked
 gates in order to complete three laps.
 
+Wood is the normal surface. The blue placemat reduces grip, and the cream
+napkin slows the marble. Cereal pieces are solid. After the right checkpoint,
+you can follow the green shortcut arrows across the napkin or stay on the
+regular bend. Both lines require the far checkpoint. The angled ruler on the
+outside of the bend can redirect a marble toward the exit.
+
 ## Play on Windows 11
 
 1. Go to [love2d.org](https://love2d.org/) and install **LÖVE 11.5 for 64-bit Windows**.
@@ -58,17 +64,28 @@ The speed display uses pixels per second.
 | `src/ai_driver.lua` | Waypoint steering, pace control, and automatic stuck recovery |
 | `src/track_collision.lua` | Track boundaries and obstacle bounce |
 | `data/physics/arcade.lua` | Shared values for speed, handling, drag, and rebound |
+| `data/physics/surfaces.lua`, `src/surfaces.lua` | Surface profiles and track-region lookup |
 | `data/racers/breakfast.lua` | Opponent pace and racing-line offsets |
 | `src/renderer.lua` | Tabletop, original shape artwork, marble, and HUD |
 | `tracks/breakfast.lua` | Circuit layout, grid, waypoints, checkpoints, and recovery points |
 | `tracks/kitchen.lua` | Dressed course with decorative props and explicit solid obstacles |
+| `tracks/kitchen_advanced.lua` | Default course with surface regions, bank barrier, and shortcut |
 | `assets/kitchen/art.lua` | Original kitchen artwork source |
 | `assets/` | Location for future artwork and audio assets |
 | `tests/` | Automated Lua checks and scripted circuit drive |
 | [Progress tracker](docs/PROGRESS_TRACKER.md) | Milestone status and verification |
 | [Recovery checkpoint](docs/RECOVERY_CHECKPOINT.md) | Verified build and resume instructions |
 
-If you have a standalone Lua interpreter, run `lua tests/run.lua`,
-`lua tests/race_progress.lua`, `lua tests/practice_loop.lua`, and
-`lua tests/ai_race.lua` from the project folder. The game only requires LÖVE.
-Run `lua tests/ai_race.lua tracks.breakfast` to race the placeholder course.
+If you have a standalone Lua interpreter, run these checks from the project
+folder. The game itself only requires LÖVE.
+
+```text
+lua tests/run.lua
+lua tests/race_progress.lua
+lua tests/practice_loop.lua
+lua tests/ai_race.lua
+lua tests/track_mechanics.lua
+```
+
+The AI test suite accepts `tracks.kitchen` for the dressed baseline or
+`tracks.breakfast` for the placeholder as an optional argument.

@@ -1,5 +1,6 @@
 local defaults = require("data.physics.arcade")
 local TrackCollision = require("src.track_collision")
+local Surfaces = require("src.surfaces")
 
 local Physics = {}
 local NEUTRAL = { steer = 0 }
@@ -57,7 +58,8 @@ end
 function Physics.step(track, marbles, inputs, dt, tuning)
     tuning = tuning or defaults
     for index, marble in ipairs(marbles) do
-        marble:step(inputs[index] or NEUTRAL, dt)
+        local surface = Surfaces.at(track, marble.x, marble.y)
+        marble:step(inputs[index] or NEUTRAL, dt, surface)
     end
     resolveTrack(track, marbles, tuning.trackBounce)
 

@@ -10,5 +10,9 @@ for the dressed track. Maple grain, gingham, the printed saucer, napkin, citrus,
 juice, cutlery, blueberries, and sugar bowls are complete for Milestone 5.
 Object placement and collision dimensions live in `tracks/kitchen.lua`.
 
+The racing placemat, shortcut napkin and signs, cereal, mug, and ruler are
+complete for Milestone 6. Their placements and hit shapes are defined in
+`tracks/kitchen_advanced.lua`.
+
 For future polish, review contrast in a manual Windows playtest and refine the
 small prop silhouettes if they become difficult to read at the minimum window size.

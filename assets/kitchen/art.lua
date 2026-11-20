@@ -47,6 +47,48 @@ function Art.drawWood(track)
     rounded("line", track.centerline)
 end
 
+function Art.drawSurfaces(regions)
+    for _, region in ipairs(regions) do
+        local x, y, w, h = region.x, region.y, region.w, region.h
+        ink(92, 62, 51, 0.27)
+        g.rectangle("fill", x + 3, y + 4, w, h)
+        if region.material == "napkin" then
+            ink(248, 226, 176)
+        else
+            ink(123, 151, 174)
+        end
+        g.rectangle("fill", x, y, w, h)
+        ink(255, 249, 215, 0.74)
+        g.setLineWidth(1)
+        for row = y + 4, y + h - 4, 6 do
+            g.line(x + 4, row, x + w - 4, row)
+        end
+        ink(67, 72, 74, 0.45)
+        g.rectangle("line", x + 3, y + 3, w - 6, h - 6)
+    end
+end
+
+function Art.drawShortcut(shortcut, font)
+    for _, point in pairs(shortcut.waypoints) do
+        g.push()
+        g.translate(point.x, point.y)
+        g.rotate(2.35)
+        ink(246, 241, 212, 0.92)
+        g.setLineWidth(8)
+        g.line(-4, -8, 4, 0, -4, 8)
+        ink(29, 108, 96)
+        g.setLineWidth(4)
+        g.line(-4, -8, 4, 0, -4, 8)
+        g.pop()
+    end
+    local x, y = shortcut.signX, shortcut.signY
+    ink(36, 96, 84)
+    g.rectangle("fill", x, y, 84, 21, 5)
+    ink(255, 247, 210)
+    g.setFont(font)
+    g.printf(shortcut.label, x, y + 3, 84, "center")
+end
+
 local function infield(mode, track)
     if track.infield then
         g.polygon(mode, track.infield)
@@ -162,11 +204,57 @@ function Art.drawDecor(prop, track, fonts)
     end
 end
 
+local function drawRuler(prop)
+    local dx, dy = prop.bx - prop.ax, prop.by - prop.ay
+    local length = math.sqrt(dx * dx + dy * dy)
+    local r = prop.radius
+    g.push()
+    g.translate(prop.ax, prop.ay)
+    g.rotate(math.atan2(dy, dx))
+    ink(115, 68, 42)
+    g.rectangle("fill", 0, -r, length, r * 2)
+    g.circle("fill", 0, 0, r)
+    g.circle("fill", length, 0, r)
+    ink(236, 192, 94)
+    g.rectangle("fill", 0, -r + 2, length, r * 2 - 4)
+    g.circle("fill", 0, 0, r - 2)
+    g.circle("fill", length, 0, r - 2)
+    ink(103, 72, 43)
+    g.setLineWidth(1)
+    for x = 0, length, 6 do
+        g.line(x, -r + 3, x, x % 12 == 0 and 3 or 0)
+    end
+    g.pop()
+end
+
 function Art.drawSolid(prop)
+    if prop.kind == "ruler" then
+        drawRuler(prop)
+        return
+    end
     local x, y, r = prop.x, prop.y, prop.radius
     ink(81, 50, 43, 0.34)
     g.circle("fill", x + 3, y + 5, r)
-    if prop.kind == "blueberry" then
+    if prop.kind == "cereal" then
+        ink(151, 79, 38)
+        g.circle("fill", x, y, r)
+        ink(245, 199, 117)
+        g.circle("fill", x, y - 1, r - 1.5)
+        ink(135, 80, 55)
+        g.circle("fill", x, y, r * 0.38)
+    elseif prop.kind == "mug" then
+        ink(83, 42, 55)
+        g.circle("fill", x, y, r)
+        ink(224, 124, 101)
+        g.circle("fill", x, y, r - 2)
+        ink(252, 225, 172)
+        g.circle("fill", x, y, r - 5)
+        ink(94, 48, 42)
+        g.circle("fill", x, y, r - 8)
+        ink(214, 153, 102)
+        g.setLineWidth(3)
+        g.arc("line", "open", x, y, r - 12, 3.6, 5.8)
+    elseif prop.kind == "blueberry" then
         ink(39, 51, 93)
         g.circle("fill", x, y, r)
         ink(77, 102, 153)

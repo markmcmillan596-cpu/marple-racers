@@ -6,11 +6,18 @@ local WAYPOINT_RADIUS = 22
 local WAYPOINT_TIMEOUT = 3.5
 local GATE_TIMEOUT = 9
 
-function Driver.new(waypoints, style)
+function Driver.new(waypoints, style, shortcut)
+    local route = waypoints
+    if style.useShortcut and shortcut then
+        route = {}
+        for index, waypoint in ipairs(waypoints) do
+            route[index] = shortcut.waypoints[index] or waypoint
+        end
+    end
     local line = {}
-    for index, waypoint in ipairs(waypoints) do
-        local previous = waypoints[(index - 2) % #waypoints + 1]
-        local following = waypoints[index % #waypoints + 1]
+    for index, waypoint in ipairs(route) do
+        local previous = route[(index - 2) % #route + 1]
+        local following = route[index % #route + 1]
         local dx, dy = following.x - previous.x, following.y - previous.y
         local length = math.sqrt(dx * dx + dy * dy)
         line[index] = {

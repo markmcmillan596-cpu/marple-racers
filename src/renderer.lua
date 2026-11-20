@@ -1,5 +1,3 @@
-local KitchenArt = require("assets.kitchen.art")
-
 local Renderer = {}
 Renderer.__index = Renderer
 
@@ -166,10 +164,17 @@ function Renderer:prepareScenery(track)
     g.clear(0, 0, 0, 1)
     self:drawTable()
     if track.theme == "kitchen" then
+        local KitchenArt = require("assets.kitchen.art")
         KitchenArt.drawWood(track)
+        if track.surfaceRegions then
+            KitchenArt.drawSurfaces(track.surfaceRegions)
+        end
         KitchenArt.drawInfield(track)
         for _, prop in ipairs(track.decorations) do
             KitchenArt.drawDecor(prop, track, self)
+        end
+        if track.shortcut then
+            KitchenArt.drawShortcut(track.shortcut, self.small)
         end
         for _, prop in ipairs(track.obstacles) do
             KitchenArt.drawSolid(prop)

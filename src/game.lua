@@ -45,7 +45,7 @@ end
 function Game.newRace(track, tuning)
     local game = Game.new(track, tuning, track.grid[1])
     for index, style in ipairs(track.opponents) do
-        addRacer(game, track.grid[index + 1], Driver.new(track.waypoints, style))
+        addRacer(game, track.grid[index + 1], Driver.new(track.waypoints, style, track.shortcut))
     end
     game.waiting = true
     return game
