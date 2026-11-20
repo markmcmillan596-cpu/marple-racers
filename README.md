@@ -50,8 +50,9 @@ The speed display uses pixels per second.
 | `src/renderer.lua` | Tabletop, original shape artwork, marble, and HUD |
 | `tracks/breakfast.lua` | Kitchen Table Circuit layout and recovery points |
 | `assets/` | Location for future artwork and audio assets |
-| `tests/run.lua` | Automated Lua checks |
-| [MILESTONES.md](MILESTONES.md) | Progress, verification, and recovery instructions |
+| `tests/` | Automated Lua checks and scripted circuit drive |
+| [Progress tracker](docs/PROGRESS_TRACKER.md) | Milestone status and verification |
+| [Recovery checkpoint](docs/RECOVERY_CHECKPOINT.md) | Verified build and resume instructions |
 
-If you have a standalone Lua interpreter, run `lua tests/run.lua` from the project
-folder. The game itself only requires LÖVE.
+If you have a standalone Lua interpreter, run `lua tests/run.lua` and
+`lua tests/practice_loop.lua` from the project folder. The game only requires LÖVE.
