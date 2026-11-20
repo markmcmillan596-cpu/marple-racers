@@ -2,6 +2,8 @@
 local Game = require("src.game")
 local Marble = require("src.marble")
 local Collision = require("src.track_collision")
+local Physics = require("src.physics")
+local defaults = require("data.physics.arcade")
 local track = require("tracks.breakfast")
 
 local neutral = { steer = 0 }
@@ -143,6 +145,134 @@ check("recovery uses the most recent checkpoint and clears momentum", function()
     near(game.player.y, recovery.y)
     near(game.player.angle, recovery.angle)
     near(game.player:speed(), 0)
+end)
+
+local STEP = 1 / 120
+
+check("shared tuning controls drive, braking, steering, drag, and radius", function()
+    local tuning = {}
+    for name, value in pairs(defaults) do
+        tuning[name] = value
+    end
+    tuning.marbleRadius = 12
+    tuning.acceleration = 120
+    tuning.driveSpeed = 5
+    tuning.braking = 240
+    tuning.steeringRate = 2
+    tuning.coastDrag = 2
+    tuning.lateralDrag = 3
+    tuning.trackBounce = 0
+
+    local game = Game.new(track, tuning)
+    local player = game.player
+    near(player.radius, 12)
+    game:update(STEP, throttle)
+    near(player:speed(), 1)
+    advance(game, 6, throttle)
+    near(player:speed(), 5)
+    game:update(STEP, brake)
+    near(player:speed(), 3)
+    player.vy = 10
+    game:update(STEP, neutral)
+    near(player.vx, 3 * math.exp(-2 * STEP))
+    near(player.vy, 10 * math.exp(-3 * STEP))
+
+    game:recover()
+    game:update(STEP, { steer = 1 })
+    near(player.angle, 2 * STEP)
+    player.y, player.vy = track.outer.y + player.radius, -100
+    game:update(STEP, neutral)
+    near(player.y, track.outer.y + player.radius)
+    near(player.vy, 0)
+end)
+
+local function racer(x, y, vx, vy)
+    local marble = Marble.new({ x = x, y = y, angle = 0 })
+    marble.vx, marble.vy = vx, vy
+    return marble
+end
+
+check("the game loop applies custom marble bounce across frame rates", function()
+    local tuning = {}
+    for name, value in pairs(defaults) do
+        tuning[name] = value
+    end
+    tuning.marbleBounce = 0
+    local function run(frameTime, frames)
+        local game = Game.new(track, tuning)
+        local player = game.player
+        player.vx = 240
+        local other = racer(player.x + 32, player.y, -240, 0)
+        game.marbles[2] = other
+        for _ = 1, frames do
+            game:update(frameTime, neutral)
+        end
+        near(player:speed(), 0)
+        near(other:speed(), 0)
+        near(other.x - player.x, player.radius + other.radius)
+        return player.x
+    end
+    near(run(1 / 30, 3), run(1 / 60, 6))
+end)
+
+check("head-on contact at full speed separates and rebounds both marbles", function()
+    local a = racer(484, 236, defaults.driveSpeed, 0)
+    local b = racer(520, 236, -defaults.driveSpeed, 0)
+    Physics.step(track, { a, b }, {}, STEP)
+    near(b.x - a.x, a.radius + b.radius)
+    near((a.x + b.x) / 2, 502)
+    local rebound = defaults.driveSpeed * math.exp(-defaults.coastDrag * STEP) * defaults.marbleBounce
+    near(a.vx, -rebound)
+    near(b.vx, rebound)
+end)
+
+check("glancing contact transfers normal momentum and preserves sliding motion", function()
+    local a, b = racer(480, 236, 160, 50), racer(511, 236, 0, 50)
+    Physics.step(track, { a, b }, {}, STEP)
+    local approach = 160 * math.exp(-defaults.coastDrag * STEP)
+    near(a.vx + b.vx, approach)
+    near(b.vx - a.vx, approach * defaults.marbleBounce)
+    near(a.vy, 50 * math.exp(-defaults.lateralDrag * STEP))
+    near(b.vy, a.vy)
+end)
+
+check("overlapping marbles moving apart keep their velocities", function()
+    local a, b = racer(480, 236, -30, 0), racer(503, 236, 30, 0)
+    Physics.step(track, { a, b }, {}, STEP)
+    near(b.x - a.x, a.radius + b.radius)
+    near(b.vx, 30 * math.exp(-defaults.coastDrag * STEP))
+    near(a.vx, -b.vx)
+end)
+
+check("coincident stationary centers separate without gaining speed", function()
+    local a, b = racer(480, 236, 0, 0), racer(480, 236, 0, 0)
+    Physics.step(track, { a, b }, {}, STEP)
+    near(b.x - a.x, a.radius + b.radius)
+    near(a:speed(), 0)
+    near(b:speed(), 0)
+end)
+
+check("four-marble contact near the rail settles without escaping or gaining speed", function()
+    local marbles = {
+        racer(480, 184, 0, 0),
+        racer(480, 214, 0, 0),
+        racer(480, 244, 0, 0),
+        racer(480, 274, 0, -defaults.driveSpeed),
+    }
+    for _ = 1, 30 do
+        Physics.step(track, marbles, {}, STEP)
+        for index, marble in ipairs(marbles) do
+            assert(marble.y >= track.outer.y + marble.radius - 1e-7)
+            assert(marble:speed() <= defaults.driveSpeed)
+            if index > 1 then
+                local previous = marbles[index - 1]
+                assert(marble.y - previous.y > marble.radius + previous.radius - 0.5)
+            end
+        end
+    end
+    for index = 2, #marbles do
+        assert(marbles[index].y - marbles[index - 1].y >= 30 - 1e-5)
+    end
 end)
 
 print(("%d checks passed"):format(passed))

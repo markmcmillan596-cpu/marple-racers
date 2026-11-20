@@ -1,3 +1,5 @@
+local defaults = require("data.physics.arcade")
+
 local Collision = {}
 
 local function clamp(value, low, high)
@@ -26,7 +28,7 @@ local function roundedRectangle(rect, x, y)
     return -inwardY - corner, 0, y - top < bottom - y and -1 or 1
 end
 
-local function separate(marble, depth, nx, ny)
+local function separate(marble, depth, nx, ny, bounce)
     if depth <= 0 then
         return
     end
@@ -36,18 +38,19 @@ local function separate(marble, depth, nx, ny)
     local closingSpeed = marble.vx * nx + marble.vy * ny
     if closingSpeed < 0 then
         -- Keep tangential motion and return a fraction of the normal speed.
-        local impulse = 1.42 * closingSpeed
+        local impulse = (1 + bounce) * closingSpeed
         marble.vx = marble.vx - nx * impulse
         marble.vy = marble.vy - ny * impulse
     end
 end
 
-function Collision.resolve(track, marble)
+function Collision.resolve(track, marble, bounce)
+    bounce = bounce or defaults.trackBounce
     local outer, ox, oy = roundedRectangle(track.outer, marble.x, marble.y)
-    separate(marble, outer + marble.radius, -ox, -oy)
+    separate(marble, outer + marble.radius, -ox, -oy, bounce)
 
     local island, ix, iy = roundedRectangle(track.island, marble.x, marble.y)
-    separate(marble, marble.radius - island, ix, iy)
+    separate(marble, marble.radius - island, ix, iy, bounce)
 
     for _, obstacle in ipairs(track.obstacles) do
         local dx, dy = marble.x - obstacle.x, marble.y - obstacle.y
@@ -55,9 +58,9 @@ function Collision.resolve(track, marble)
         local overlap = obstacle.radius + marble.radius - distance
         if overlap > 0 then
             if distance > 0 then
-                separate(marble, overlap, dx / distance, dy / distance)
+                separate(marble, overlap, dx / distance, dy / distance, bounce)
             else
-                separate(marble, overlap, 1, 0)
+                separate(marble, overlap, 1, 0, bounce)
             end
         end
     end

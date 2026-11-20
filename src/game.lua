@@ -1,5 +1,5 @@
 local Marble = require("src.marble")
-local Collision = require("src.track_collision")
+local Physics = require("src.physics")
 
 local Game = {}
 Game.__index = Game
@@ -7,10 +7,14 @@ Game.__index = Game
 local STEP = 1 / 120
 local MAX_FRAME_TIME = 0.1
 
-function Game.new(track)
+function Game.new(track, tuning)
+    local player = Marble.new(track.checkpoints[1], tuning)
     return setmetatable({
         track = track,
-        player = Marble.new(track.checkpoints[1]),
+        player = player,
+        marbles = { player },
+        inputs = {},
+        tuning = player.tuning,
         checkpoint = track.checkpoints[1],
         accumulator = 0,
         paused = false,
@@ -41,11 +45,11 @@ function Game:update(dt, input)
     end
 
     -- Fixed simulation steps keep steering and collisions independent of redraw rate.
+    self.inputs[1] = input
     self.accumulator = self.accumulator + math.min(dt, MAX_FRAME_TIME)
     while self.accumulator + 1e-10 >= STEP do
         self.accumulator = math.max(0, self.accumulator - STEP)
-        self.player:step(input, STEP)
-        Collision.resolve(self.track, self.player)
+        Physics.step(self.track, self.marbles, self.inputs, STEP, self.tuning)
 
         for _, checkpoint in ipairs(self.track.checkpoints) do
             local dx = self.player.x - checkpoint.x

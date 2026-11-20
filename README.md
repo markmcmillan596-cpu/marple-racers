@@ -46,7 +46,9 @@ The speed display uses pixels per second.
 | `main.lua`, `conf.lua` | LÖVE entry point, input bindings, and window configuration |
 | `src/game.lua` | Fixed-step simulation loop, pause, and recovery state |
 | `src/marble.lua` | Steering, acceleration, braking, and momentum |
+| `src/physics.lua` | Fixed-step movement and contact resolution for the marbles |
 | `src/track_collision.lua` | Track boundaries and obstacle bounce |
+| `data/physics/arcade.lua` | Shared values for speed, handling, drag, and rebound |
 | `src/renderer.lua` | Tabletop, original shape artwork, marble, and HUD |
 | `tracks/breakfast.lua` | Kitchen Table Circuit layout and recovery points |
 | `assets/` | Location for future artwork and audio assets |

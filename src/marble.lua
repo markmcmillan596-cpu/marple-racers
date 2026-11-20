@@ -1,13 +1,11 @@
+local defaults = require("data.physics.arcade")
+
 local Marble = {}
 Marble.__index = Marble
 
-local TOP_SPEED = 420
-local ACCELERATION = 530
-local BRAKING = 880
-local STEERING = 3.6
-
-function Marble.new(checkpoint)
-    local marble = setmetatable({ radius = 15 }, Marble)
+function Marble.new(checkpoint, tuning)
+    tuning = tuning or defaults
+    local marble = setmetatable({ radius = tuning.marbleRadius, tuning = tuning }, Marble)
     marble:reset(checkpoint)
     return marble
 end
@@ -23,21 +21,23 @@ function Marble:speed()
 end
 
 function Marble:step(input, dt)
+    local tuning = self.tuning
     local speed = self:speed()
-    local steeringGrip = math.max(0.72, 1 - 0.28 * speed / TOP_SPEED)
-    self.angle = (self.angle + input.steer * STEERING * steeringGrip * dt) % (2 * math.pi)
+    local gripLoss = (1 - tuning.minimumSteeringGrip) * speed / tuning.driveSpeed
+    local steeringGrip = math.max(tuning.minimumSteeringGrip, 1 - gripLoss)
+    self.angle = (self.angle + input.steer * tuning.steeringRate * steeringGrip * dt) % (2 * math.pi)
 
     local hx, hy = math.cos(self.angle), math.sin(self.angle)
     -- Resolve velocity along and across the heading so lateral slip fades quickly.
     local forward = self.vx * hx + self.vy * hy
-    local sideways = (self.vy * hx - self.vx * hy) * math.exp(-7 * dt)
+    local sideways = (self.vy * hx - self.vx * hy) * math.exp(-tuning.lateralDrag * dt)
     if input.brake then
-        local slowdown = math.max(0, speed - BRAKING * dt) / math.max(speed, 1e-9)
+        local slowdown = math.max(0, speed - tuning.braking * dt) / math.max(speed, 1e-9)
         forward, sideways = forward * slowdown, sideways * slowdown
     elseif input.accelerate then
-        forward = math.min(TOP_SPEED, forward + ACCELERATION * dt)
+        forward = math.min(tuning.driveSpeed, forward + tuning.acceleration * dt)
     else
-        forward = forward * math.exp(-0.9 * dt)
+        forward = forward * math.exp(-tuning.coastDrag * dt)
     end
 
     self.vx = hx * forward - hy * sideways
