@@ -1,5 +1,6 @@
 local Marble = require("src.marble")
 local Physics = require("src.physics")
+local RaceProgress = require("src.race_progress")
 
 local Game = {}
 Game.__index = Game
@@ -8,14 +9,14 @@ local STEP = 1 / 120
 local MAX_FRAME_TIME = 0.1
 
 function Game.new(track, tuning)
-    local player = Marble.new(track.checkpoints[1], tuning)
+    local player = Marble.new(track.gates[1].respawn, tuning)
     return setmetatable({
         track = track,
         player = player,
         marbles = { player },
         inputs = {},
         tuning = player.tuning,
-        checkpoint = track.checkpoints[1],
+        progress = RaceProgress.new(track.gates, track.totalLaps),
         accumulator = 0,
         paused = false,
     }, Game)
@@ -35,7 +36,7 @@ function Game:togglePause()
 end
 
 function Game:recover()
-    self.player:reset(self.checkpoint)
+    self.player:reset(self.progress.lastGate.respawn)
     self.accumulator = 0
 end
 
@@ -49,16 +50,9 @@ function Game:update(dt, input)
     self.accumulator = self.accumulator + math.min(dt, MAX_FRAME_TIME)
     while self.accumulator + 1e-10 >= STEP do
         self.accumulator = math.max(0, self.accumulator - STEP)
+        local oldX, oldY = self.player.x, self.player.y
         Physics.step(self.track, self.marbles, self.inputs, STEP, self.tuning)
-
-        for _, checkpoint in ipairs(self.track.checkpoints) do
-            local dx = self.player.x - checkpoint.x
-            local dy = self.player.y - checkpoint.y
-            if dx * dx + dy * dy <= checkpoint.radius * checkpoint.radius then
-                self.checkpoint = checkpoint
-                break
-            end
-        end
+        self.progress:advance(oldX, oldY, self.player.x, self.player.y)
     end
 end
 

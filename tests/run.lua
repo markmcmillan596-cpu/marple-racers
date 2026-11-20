@@ -9,8 +9,8 @@ local track = require("tracks.breakfast")
 local neutral = { steer = 0 }
 local throttle = { accelerate = true, steer = 0 }
 local brake = { brake = true, steer = 0 }
-local start = track.checkpoints[1]
-local recovery = track.checkpoints[2]
+local start = track.gates[1].respawn
+local recovery = track.gates[2].respawn
 local passed = 0
 
 local function check(name, body)
@@ -133,9 +133,10 @@ check("recovery uses the most recent checkpoint and clears momentum", function()
     game.player.x = start.x + 120
     game:recover()
     near(game.player.x, start.x)
-    game.player.x, game.player.y = recovery.x + 30, recovery.y
+    game.player.x, game.player.y = recovery.x, track.gates[2].ay - 1
+    game.player.angle, game.player.vy = recovery.angle, 200
     advance(game, 1, throttle)
-    assert(game.checkpoint == recovery)
+    assert(game.progress.lastGate == track.gates[2])
     game.player.x = recovery.x - 100
     game.player.angle = 0
     game.player.vx, game.player.vy = 79, 12

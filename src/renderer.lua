@@ -49,36 +49,33 @@ function Renderer:drawTable()
     panel("line", 39, 121, 1022, 526, 29)
 end
 
-local function drawCheckpoint(checkpoint, active)
+local function drawGate(gate, finish, active)
+    local dx, dy = gate.bx - gate.ax, gate.by - gate.ay
+    local half = math.sqrt(dx * dx + dy * dy) / 2
     g.push()
-    g.translate(checkpoint.x, checkpoint.y)
-    g.rotate(checkpoint.angle)
+    g.translate((gate.ax + gate.bx) / 2, (gate.ay + gate.by) / 2)
+    g.rotate(math.atan2(dx, -dy))
 
-    local start = checkpoint.label == "START"
-    -- Crosswise stripe and two end caps mark each recovery location.
-    if start then
-        for row = 0, 8 do
+    if finish then
+        local rows = math.floor(half / 5)
+        for row = 0, rows - 1 do
             for column = 0, 1 do
                 local shade = (row + column) % 2 == 0 and 240 or 64
                 color(shade, shade, shade, 0.92)
-                g.rectangle("fill", -10 + column * 10, -45 + row * 10, 10, 10)
+                g.rectangle("fill", -10 + column * 10, -5 * rows + row * 10, 10, 10)
             end
         end
     else
-        color(246, 198, 117, 0.72)
-        g.setLineWidth(3)
-        for y = -38, 38, 19 do
-            g.line(-8, y - 6, 1, y, -8, y + 6)
+        if active then
+            color(143, 221, 205, 0.95)
+        else
+            color(246, 198, 117, 0.42)
+        end
+        g.setLineWidth(2)
+        for y = -half + 13, half - 12, 19 do
+            g.line(-5, y - 5, 2, y, -5, y + 5)
         end
     end
-
-    if active then
-        color(143, 221, 205)
-    else
-        color(200, 173, 137)
-    end
-    g.circle("fill", -2, -49, 3)
-    g.circle("fill", -2, 49, 3)
     g.pop()
 end
 
@@ -141,8 +138,8 @@ function Renderer:drawTrack(game)
     end
     self:drawPlate(track)
 
-    for _, checkpoint in ipairs(track.checkpoints) do
-        drawCheckpoint(checkpoint, checkpoint == game.checkpoint)
+    for index, gate in ipairs(track.gates) do
+        drawGate(gate, index == 1, not game.progress.finished and game.progress.nextGateIndex == index)
     end
     for _, prop in ipairs(track.obstacles) do
         drawObstacle(prop)
@@ -207,14 +204,19 @@ function Renderer:drawHUD(game)
     g.print("Around the House", 35, 58)
 
     color(101, 65, 54)
-    panel("fill", 787, 21, 280, 62, 11)
+    panel("fill", 626, 21, 441, 62, 11)
     color(240, 204, 165)
     g.setFont(self.small)
-    g.print("RECOVERY POINT", 801, 31)
+    g.print("LAP", 641, 31)
+    g.print("RECOVERY POINT", 779, 31)
     g.printf("SPEED", 962, 31, 89, "right")
     color(255, 236, 210)
     g.setFont(self.medium)
-    g.print(game.checkpoint.label == "START" and "Start line" or "Far straight", 801, 49)
+    local progress = game.progress
+    local lapLabel = progress.finished and "Finished"
+        or ("%d / %d"):format(progress.completedLaps + 1, progress.totalLaps)
+    g.print(lapLabel, 641, 49)
+    g.print(progress.lastGate.label, 779, 49)
     g.printf(("%d px/s"):format(math.floor(game.player:speed() + 0.5)), 944, 49, 107, "right")
 
     color(246, 221, 186)
