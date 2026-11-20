@@ -1,9 +1,9 @@
 # Progress tracker
 
-- **Current milestone:** Milestone 5 verified and complete. Milestone 6 is queued.
+- **Current milestone:** Milestone 6 verified and complete. Milestone 7 is queued.
 - **In progress:** None.
-- **Latest verified game commit:** `f022baf6bca0239c2ff87ac5b12cc3f1a455b557`.
-- **Last successful launch check:** 2026-11-20, four-racer LÖVE 11.5 launch on Linux Xvfb with synthetic driving input.
+- **Latest verified game commit:** `ee5410083988bb4cde01afe4816136d44b2509b9`.
+- **Last successful launch check:** 2026-11-20, advanced and classic four-racer LÖVE 11.5 launches on Linux Xvfb with synthetic driving input.
 - **Outstanding validation:** Manual playtesting, Windows 11 launch, and measured Windows frame rate.
 
 ## Milestone status
@@ -15,7 +15,7 @@
 | 3. Checkpoints and lap management | COMPLETE — VERIFIED |
 | 4. AI racing opponents | COMPLETE — VERIFIED |
 | 5. Kitchen table environment | COMPLETE — VERIFIED |
-| 6. Advanced track mechanics | NOT STARTED |
+| 6. Advanced track mechanics | COMPLETE — VERIFIED |
 | 7. User interface and race presentation | NOT STARTED |
 | 8. Testing, balancing, and first playable release | NOT STARTED |
 
@@ -83,9 +83,30 @@
 - [Artwork source and status](../assets/README.md) are recorded. Manual gameplay
   and Windows render performance remain unverified.
 
+## Milestone 6 verification
+
+- The default course has configurable wood, napkin, and placemat physics,
+  solid cereal, a mug, an angled ruler, and a marked shortcut between the
+  right and far checkpoints. One opponent uses it in normal play.
+- The test suite verified added drag, reduced traction, cereal separation,
+  and a bank off the ruler that carried the marble toward the exit after
+  losing speed. The tested shortcut waypoint segment measured about 395
+  pixels versus 484 pixels on the regular line.
+- On Lua 5.1 and 5.4, both scripted player routes produced four legal
+  three-lap finishes. The designated AI took the shortcut on all three
+  laps while the others stayed on the regular bend. All five seeded runs
+  per runtime completed with four finishers and no AI recoveries. The
+  idle-player and forced-recovery scenarios also passed.
+- All five suites passed on Lua 5.1 and 5.4. The AI suite also passed on
+  the dressed baseline and classic course on Lua 5.1. Linux LÖVE smoke
+  checks passed on the default and classic courses.
+- [Artwork source and status](../assets/README.md) are recorded. Manual
+  gameplay, Windows 11 launch, and Windows frame-rate testing remain open.
+
 ## Exact next task
 
-Start Milestone 6 with configurable wood, napkin, and placemat handling.
-Add cereal contacts, an angled rebound barrier, and a shorter route between
-the right and far checkpoints. Verify that both race lines obey every gate
-and can finish with four racers.
+Start Milestone 7 by adding a main menu with Quick Race, Controls, Settings,
+and Exit, plus an explicit three-second countdown before the racers move.
+Wire the flow through race completion, results, restart, and return to menu.
+Then expose verified race timing, standings, and lap statistics in the HUD
+and results, and test the full menu-to-results flow.
