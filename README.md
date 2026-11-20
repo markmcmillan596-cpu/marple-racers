@@ -24,6 +24,9 @@ You can also open PowerShell in the project folder. In File Explorer, type
 If an error says that `main.lua` is missing, check that the folder you launched
 contains it directly. LÖVE includes its own Lua runtime.
 
+To launch the original placeholder course, add `--classic` after the project
+path. In the same PowerShell window, run `& "C:\Program Files\LOVE\love.exe" . --classic`.
+
 ## Controls
 
 | Key | Action |
@@ -58,6 +61,8 @@ The speed display uses pixels per second.
 | `data/racers/breakfast.lua` | Opponent pace and racing-line offsets |
 | `src/renderer.lua` | Tabletop, original shape artwork, marble, and HUD |
 | `tracks/breakfast.lua` | Circuit layout, grid, waypoints, checkpoints, and recovery points |
+| `tracks/kitchen.lua` | Dressed course with decorative props and explicit solid obstacles |
+| `assets/kitchen/art.lua` | Original kitchen artwork source |
 | `assets/` | Location for future artwork and audio assets |
 | `tests/` | Automated Lua checks and scripted circuit drive |
 | [Progress tracker](docs/PROGRESS_TRACKER.md) | Milestone status and verification |
@@ -66,3 +71,4 @@ The speed display uses pixels per second.
 If you have a standalone Lua interpreter, run `lua tests/run.lua`,
 `lua tests/race_progress.lua`, `lua tests/practice_loop.lua`, and
 `lua tests/ai_race.lua` from the project folder. The game only requires LÖVE.
+Run `lua tests/ai_race.lua tracks.breakfast` to race the placeholder course.

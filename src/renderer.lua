@@ -1,3 +1,5 @@
+local KitchenArt = require("assets.kitchen.art")
+
 local Renderer = {}
 Renderer.__index = Renderer
 
@@ -55,7 +57,7 @@ function Renderer:drawTable()
     panel("line", 39, 121, 1022, 526, 29)
 end
 
-local function drawGate(gate, finish, active)
+local function drawGate(gate, finish, active, kitchen)
     local dx, dy = gate.bx - gate.ax, gate.by - gate.ay
     local half = math.sqrt(dx * dx + dy * dy) / 2
     g.push()
@@ -72,7 +74,11 @@ local function drawGate(gate, finish, active)
             end
         end
     else
-        if active then
+        if kitchen and active then
+            color(22, 88, 77)
+        elseif kitchen then
+            color(116, 68, 45, 0.47)
+        elseif active then
             color(143, 221, 205, 0.95)
         else
             color(246, 198, 117, 0.42)
@@ -116,8 +122,7 @@ local function drawObstacle(prop)
     end
 end
 
-function Renderer:drawTrack(game)
-    local track = game.track
+function Renderer:drawPlaceholder(track)
     color(103, 63, 49)
     panel("fill", track.outer.x, track.outer.y + 7, track.outer.w, track.outer.h, track.outer.corner)
     color(76, 60, 65)
@@ -144,12 +149,36 @@ function Renderer:drawTrack(game)
     end
     self:drawPlate(track)
 
-    for index, gate in ipairs(track.gates) do
-        drawGate(gate, index == 1, not game.progress.finished and game.progress.nextGateIndex == index)
-    end
     for _, prop in ipairs(track.obstacles) do
         drawObstacle(prop)
     end
+end
+
+-- Cache the scenery once. Gates and racers are drawn separately each frame.
+function Renderer:prepareScenery(track)
+    if self.cachedTrack == track then
+        return
+    end
+    self.scenery = self.scenery or g.newCanvas(WIDTH, HEIGHT, { dpiscale = 1 })
+    g.push("all")
+    g.setCanvas({ self.scenery, stencil = true })
+    g.origin()
+    g.clear(0, 0, 0, 1)
+    self:drawTable()
+    if track.theme == "kitchen" then
+        KitchenArt.drawWood(track)
+        KitchenArt.drawInfield(track)
+        for _, prop in ipairs(track.decorations) do
+            KitchenArt.drawDecor(prop, track, self)
+        end
+        for _, prop in ipairs(track.obstacles) do
+            KitchenArt.drawSolid(prop)
+        end
+    else
+        self:drawPlaceholder(track)
+    end
+    g.pop()
+    self.cachedTrack = track
 end
 
 function Renderer:drawPlate(track)
@@ -244,14 +273,19 @@ function Renderer:drawHUD(game)
 end
 
 function Renderer:draw(game)
+    self:prepareScenery(game.track)
     local w, h = g.getDimensions()
     local scale = math.min(w / WIDTH, h / HEIGHT)
     g.clear(0.12, 0.09, 0.10)
     g.push()
     g.translate((w - WIDTH * scale) / 2, (h - HEIGHT * scale) / 2)
     g.scale(scale)
-    self:drawTable()
-    self:drawTrack(game)
+    color(255, 255, 255)
+    g.draw(self.scenery)
+    for index, gate in ipairs(game.track.gates) do
+        drawGate(gate, index == 1, not game.progress.finished and game.progress.nextGateIndex == index,
+            game.track.theme == "kitchen")
+    end
     for index = #game.racers, 1, -1 do
         local racer = game.racers[index]
         drawMarble(racer.marble, marbleColors[index], racer.marble == game.player)

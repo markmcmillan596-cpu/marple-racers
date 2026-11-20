@@ -1,7 +1,7 @@
 -- Run from the project root with lua tests/ai_race.lua.
 local Driver = require("src.ai_driver")
 local Game = require("src.game")
-local track = require("tracks.breakfast")
+local track = require((arg and arg[1]) or "tracks.kitchen")
 
 local FRAME = 1 / 60
 local STEP = 1 / 120

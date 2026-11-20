@@ -1,13 +1,19 @@
 local Game = require("src.game")
 local Renderer = require("src.renderer")
-local track = require("tracks.breakfast")
+local track = require("tracks.kitchen")
 
 local game
 local view
 
-function love.load()
+function love.load(arguments)
     love.keyboard.setKeyRepeat(false)
-    game = Game.newRace(track)
+    local course = track
+    for _, option in ipairs(arguments) do
+        if option == "--classic" then
+            course = require("tracks.breakfast")
+        end
+    end
+    game = Game.newRace(course)
     view = Renderer.new()
 end
 
