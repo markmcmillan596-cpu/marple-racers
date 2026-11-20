@@ -1,8 +1,8 @@
 # Progress tracker
 
-- **Current milestone:** Milestone 4 verified and complete. Milestone 5 is queued.
+- **Current milestone:** Milestone 5 verified and complete. Milestone 6 is queued.
 - **In progress:** None.
-- **Latest verified game commit:** `a0a3c0fa707212aa7b95862f22fa0fd48255901b`.
+- **Latest verified game commit:** `f022baf6bca0239c2ff87ac5b12cc3f1a455b557`.
 - **Last successful launch check:** 2026-11-20, four-racer LÖVE 11.5 launch on Linux Xvfb with synthetic driving input.
 - **Outstanding validation:** Manual playtesting, Windows 11 launch, and measured Windows frame rate.
 
@@ -14,7 +14,7 @@
 | 2. Arcade marble physics | COMPLETE — VERIFIED |
 | 3. Checkpoints and lap management | COMPLETE — VERIFIED |
 | 4. AI racing opponents | COMPLETE — VERIFIED |
-| 5. Kitchen table environment | NOT STARTED |
+| 5. Kitchen table environment | COMPLETE — VERIFIED |
 | 6. Advanced track mechanics | NOT STARTED |
 | 7. User interface and race presentation | NOT STARTED |
 | 8. Testing, balancing, and first playable release | NOT STARTED |
@@ -73,11 +73,19 @@
   movement, player input, pause, recovery, and resizing. Manual gameplay,
   Windows 11 launch, and Windows render performance remain untested.
 
+## Milestone 5 verification
+
+- The dressed course uses original wood grain, kitchen textiles, tableware,
+  fruit, and props. Decoration and solid hit shapes are listed separately.
+  Static scenery is cached. `--classic` loads the original placeholder.
+- Both courses passed the four-racer AI suite and LÖVE 11.5 Linux smoke checks.
+  All 16 physics checks, race rules, and the scripted solo drive also passed.
+- [Artwork source and status](../assets/README.md) are recorded. Manual gameplay
+  and Windows render performance remain unverified.
+
 ## Exact next task
 
-Start Milestone 5 by keeping the verified placeholder course available as a
-fallback and creating a separate version of the Kitchen Table Circuit with
-original household scenery. Define decorative objects separately from solid
-obstacles and their collision shapes. Keep routes wide enough for four marbles,
-save the art source files and asset status, and rerun full races at the existing
-AI pace to check that all competitors can navigate the dressed course.
+Start Milestone 6 with configurable wood, napkin, and placemat handling.
+Add cereal contacts, an angled rebound barrier, and a shorter route between
+the right and far checkpoints. Verify that both race lines obey every gate
+and can finish with four racers.
