@@ -12,12 +12,12 @@ function RaceProgress.new(gates, totalLaps)
     }, RaceProgress)
 end
 
-local function crossesForward(gate, oldX, oldY, x, y)
+local function crossingFraction(gate, oldX, oldY, x, y)
     local dx, dy = gate.bx - gate.ax, gate.by - gate.ay
     local before = dx * (oldY - gate.ay) - dy * (oldX - gate.ax)
     local after = dx * (y - gate.ay) - dy * (x - gate.ax)
     if before > 0 or after <= 0 then
-        return false
+        return nil
     end
 
     -- Intersect the movement with the gate's line, then check its finite span.
@@ -25,12 +25,18 @@ local function crossesForward(gate, oldX, oldY, x, y)
     local hitX = oldX + (x - oldX) * fraction - gate.ax
     local hitY = oldY + (y - oldY) * fraction - gate.ay
     local along = hitX * dx + hitY * dy
-    return along >= 0 and along <= dx * dx + dy * dy
+    if along >= 0 and along <= dx * dx + dy * dy then
+        return fraction
+    end
 end
 
 function RaceProgress:advance(oldX, oldY, x, y)
+    if self.finished then
+        return
+    end
     local gate = self.gates[self.nextGateIndex]
-    if self.finished or not crossesForward(gate, oldX, oldY, x, y) then
+    local fraction = crossingFraction(gate, oldX, oldY, x, y)
+    if not fraction then
         return
     end
 
@@ -40,7 +46,7 @@ function RaceProgress:advance(oldX, oldY, x, y)
         self.finished = self.completedLaps == self.totalLaps
     end
     self.nextGateIndex = self.nextGateIndex % #self.gates + 1
-    return gate
+    return gate, fraction
 end
 
 return RaceProgress

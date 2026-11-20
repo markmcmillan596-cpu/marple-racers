@@ -1,8 +1,9 @@
 # Marble Racers: Around the House
 
 Drive a turquoise marble around the **Kitchen Table Circuit — Breakfast Grand Prix**.
-Follow the loop clockwise from the checkered stripe and steer around blueberries
-and sugar cubes. Cross the marked gates in order to complete three laps.
+Press the accelerator to start the race with three computer-controlled rivals.
+Drive clockwise, steer around blueberries and sugar cubes, and cross the marked
+gates in order to complete three laps.
 
 ## Play on Windows 11
 
@@ -38,7 +39,8 @@ The white arrow shows current travel direction and the dark dot shows where
 the marble is aimed. While stopped, the arrow points where you are aimed.
 The highlighted arrows mark the next checkpoint. Cross it in the arrow's
 direction to update your recovery point. After the three checkpoints, cross
-the checkered stripe to count a lap. Recovery preserves your progress.
+the checkered stripe to count a lap. Recovery preserves your progress. The lap
+display shows your finishing position when you complete the third lap.
 The speed display uses pixels per second.
 
 ## Project layout
@@ -50,15 +52,17 @@ The speed display uses pixels per second.
 | `src/marble.lua` | Steering, acceleration, braking, and momentum |
 | `src/physics.lua` | Fixed-step movement and contact resolution for the marbles |
 | `src/race_progress.lua` | Ordered gate crossings, lap count, and finish state |
+| `src/ai_driver.lua` | Waypoint steering, pace control, and automatic stuck recovery |
 | `src/track_collision.lua` | Track boundaries and obstacle bounce |
 | `data/physics/arcade.lua` | Shared values for speed, handling, drag, and rebound |
+| `data/racers/breakfast.lua` | Opponent pace and racing-line offsets |
 | `src/renderer.lua` | Tabletop, original shape artwork, marble, and HUD |
-| `tracks/breakfast.lua` | Kitchen Table Circuit layout, checkpoint gates, and recovery points |
+| `tracks/breakfast.lua` | Circuit layout, grid, waypoints, checkpoints, and recovery points |
 | `assets/` | Location for future artwork and audio assets |
 | `tests/` | Automated Lua checks and scripted circuit drive |
 | [Progress tracker](docs/PROGRESS_TRACKER.md) | Milestone status and verification |
 | [Recovery checkpoint](docs/RECOVERY_CHECKPOINT.md) | Verified build and resume instructions |
 
 If you have a standalone Lua interpreter, run `lua tests/run.lua`,
-`lua tests/race_progress.lua`, and `lua tests/practice_loop.lua` from the
-project folder. The game only requires LÖVE.
+`lua tests/race_progress.lua`, `lua tests/practice_loop.lua`, and
+`lua tests/ai_race.lua` from the project folder. The game only requires LÖVE.

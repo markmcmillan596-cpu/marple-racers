@@ -7,7 +7,7 @@ local view
 
 function love.load()
     love.keyboard.setKeyRepeat(false)
-    game = Game.new(track)
+    game = Game.newRace(track)
     view = Renderer.new()
 end
 

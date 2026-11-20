@@ -3,6 +3,12 @@ Renderer.__index = Renderer
 
 local g = love.graphics
 local WIDTH, HEIGHT = 1100, 720
+local marbleColors = {
+    { 104, 239, 214 },
+    { 255, 176, 96 },
+    { 197, 155, 245 },
+    { 240, 116, 144 },
+}
 
 local function color(r, green, b, alpha)
     g.setColor(r / 255, green / 255, b / 255, alpha or 1)
@@ -162,19 +168,22 @@ function Renderer:drawPlate(track)
     g.printf(track.title, 310, 390, 480, "center")
 end
 
-local function drawMarble(player)
+local function drawMarble(player, shade, controlled)
     local x, y, r = player.x, player.y, player.radius
     color(24, 22, 29, 0.55)
     g.circle("fill", x + 3, y + 5, r + 2)
     color(26, 81, 82)
     g.circle("fill", x, y, r)
-    color(104, 239, 214)
+    color(shade[1], shade[2], shade[3])
     g.circle("fill", x - 1, y - 1, r - 2)
     color(213, 255, 241)
     g.circle("fill", x - 4, y - 5, 4)
     color(229, 255, 246)
     g.setLineWidth(2)
     g.circle("line", x, y, r)
+    if not controlled then
+        return
+    end
 
     -- A dark pip shows the steering heading even while the marble is sliding.
     color(26, 81, 82)
@@ -215,10 +224,20 @@ function Renderer:drawHUD(game)
     local progress = game.progress
     local lapLabel = progress.finished and "Finished"
         or ("%d / %d"):format(progress.completedLaps + 1, progress.totalLaps)
+    for position, racer in ipairs(game.finishOrder) do
+        if racer.marble == game.player then
+            lapLabel = ("Finished %d / %d"):format(position, #game.racers)
+            break
+        end
+    end
     g.print(lapLabel, 641, 49)
     g.print(progress.lastGate.label, 779, 49)
     g.printf(("%d px/s"):format(math.floor(game.player:speed() + 0.5)), 944, 49, 107, "right")
 
+    if game.waiting then
+        color(231, 172, 125)
+        g.printf("Accelerate to start", 316, 44, 281, "center")
+    end
     color(246, 221, 186)
     g.printf("W / Up  Accelerate     S / Down  Brake     A D / Left Right  Steer     R  Recover     Esc  Pause",
         25, 684, 1050, "center")
@@ -233,7 +252,10 @@ function Renderer:draw(game)
     g.scale(scale)
     self:drawTable()
     self:drawTrack(game)
-    drawMarble(game.player)
+    for index = #game.racers, 1, -1 do
+        local racer = game.racers[index]
+        drawMarble(racer.marble, marbleColors[index], racer.marble == game.player)
+    end
     self:drawHUD(game)
 
     if game.paused then
