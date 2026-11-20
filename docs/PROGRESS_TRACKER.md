@@ -1,9 +1,9 @@
 # Progress tracker
 
-- **Current milestone:** Milestone 3 verified and complete. Milestone 4 is queued.
+- **Current milestone:** Milestone 4 verified and complete. Milestone 5 is queued.
 - **In progress:** None.
-- **Latest verified game commit:** `6c1972beaf77877efff8724c23b5230d3e154fc6`.
-- **Last successful test:** 2026-11-20, LÖVE 11.5 launch with synthetic driving input on Linux Xvfb.
+- **Latest verified game commit:** `a0a3c0fa707212aa7b95862f22fa0fd48255901b`.
+- **Last successful launch check:** 2026-11-20, four-racer LÖVE 11.5 launch on Linux Xvfb with synthetic driving input.
 - **Outstanding validation:** Manual playtesting, Windows 11 launch, and measured Windows frame rate.
 
 ## Milestone status
@@ -13,7 +13,7 @@
 | 1. Project foundation | COMPLETE — VERIFIED |
 | 2. Arcade marble physics | COMPLETE — VERIFIED |
 | 3. Checkpoints and lap management | COMPLETE — VERIFIED |
-| 4. AI racing opponents | NOT STARTED |
+| 4. AI racing opponents | COMPLETE — VERIFIED |
 | 5. Kitchen table environment | NOT STARTED |
 | 6. Advanced track mechanics | NOT STARTED |
 | 7. User interface and race presentation | NOT STARTED |
@@ -58,9 +58,26 @@
   drive, and the LÖVE 11.5 Linux window smoke test passed.
 - Manual gameplay and Windows 11 remain untested.
 
+## Milestone 4 verification
+
+- The game opens on a four-marble grid and starts when the player accelerates.
+  Three AI rivals follow different lines and target speeds through the same
+  physics, gate rules, and recovery system as the player. Finishing order uses
+  the time each racer crosses the line, including crossings in the same step.
+- All four Lua suites passed on Lua 5.1 and 5.4. On each runtime, all four racers
+  finished five seeded races and all three opponents finished with an idle
+  player. There were no AI recoveries in those runs.
+- A deliberately stalled opponent recovered to its last valid gate, retained
+  progress, and completed the race on both Lua runtimes.
+- Automated LÖVE 11.5 window checks verified four visible marbles, opponent
+  movement, player input, pause, recovery, and resizing. Manual gameplay,
+  Windows 11 launch, and Windows render performance remain untested.
+
 ## Exact next task
 
-Start Milestone 4 by defining a four-racer grid and clockwise waypoints in
-the track data. Give three AI marbles a waypoint controller and stuck recovery.
-Run them through the existing fixed-step physics and race rules, and verify
-that all three opponents can finish a three-lap race.
+Start Milestone 5 by keeping the verified placeholder course available as a
+fallback and creating a separate version of the Kitchen Table Circuit with
+original household scenery. Define decorative objects separately from solid
+obstacles and their collision shapes. Keep routes wide enough for four marbles,
+save the art source files and asset status, and rerun full races at the existing
+AI pace to check that all competitors can navigate the dressed course.
