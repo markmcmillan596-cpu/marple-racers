@@ -1,38 +1,25 @@
 # Recovery checkpoint
 
 - **Project:** Marble Racers: Around the House
-- **Captured:** 2026-11-20 10:53 EST
+- **Captured:** 2026-11-20 11:01 EST
 - **Branch:** `marble-racers-development`
-- **Verified game commit:** `0d2db425c42685638036db44f446e9105d309618`
-- **Last completed milestone:** Milestone 2 — Arcade marble physics
-- **Current incomplete milestone:** Milestone 3 — Checkpoints and lap management, queued
+- **Verified game commit:** `6c1972beaf77877efff8724c23b5230d3e154fc6`
+- **Last completed milestone:** Milestone 3 — Checkpoints and lap management
+- **Current incomplete milestone:** Milestone 4 — AI racing opponents
 
 ## Files and Git
 
-- Milestone 2 added `data/physics/arcade.lua` and `src/physics.lua`.
-- It changed `src/game.lua`, `src/marble.lua`, `src/track_collision.lua`,
-  `tests/run.lua`, and `README.md`.
-- The physics commit was pushed and matched the remote branch at capture.
-  This checkpoint and the progress tracker were the only pending files.
-- To verify the current state, run `git rev-parse HEAD`,
-  `git status --short --branch`, and
-  `git ls-remote origin refs/heads/marble-racers-development`.
+- Added `src/race_progress.lua` and `tests/race_progress.lua`.
+- Updated track gates, game integration, renderer, README, and the existing tests.
+- At capture, the code commit was local. The tracker and this checkpoint were pending.
+  Use `git status --short --branch` and
+  `git ls-remote origin refs/heads/marble-racers-development` to verify current state.
 
-## Test results and known gaps
+## Tests and resume
 
-Lua syntax checks, all 16 Lua checks, the scripted full circuit, and the LÖVE
-11.5 Linux window check passed. A 454-frame player trace matched Milestone 1.
-Multi-marble contacts were tested in simulation. The game opens on the
-single-marble practice circuit. Manual gameplay, Windows 11 launch, and measured
-Windows frame rate remain open. See the [progress tracker](PROGRESS_TRACKER.md#milestone-2-verification).
+Run `lua tests/run.lua`, `lua tests/race_progress.lua`, and
+`lua tests/practice_loop.lua`. All passed, along with Lua parsing and a Linux
+LÖVE 11.5 smoke check. Manual playtesting and Windows 11 remain untested.
 
-## Resume
-
-1. Open the project checkout and verify the branch, current commit, and
-   working tree against the progress tracker.
-2. Run `lua tests/run.lua` and `lua tests/practice_loop.lua` from the project
-   folder. Launch with `love .` or follow the [Windows 11 launch steps](../README.md#play-on-windows-11).
-3. For a manual check, drive through the far straight marker, press R after
-   leaving it, and verify that the marble returns facing left and stationary.
-   Press Esc and verify that driving input has no effect while paused.
-4. Resume at the [exact Milestone 3 task](PROGRESS_TRACKER.md#exact-next-task).
+Launch with `love .` or the [Windows instructions](../README.md#play-on-windows-11).
+Continue at the [exact Milestone 4 task](PROGRESS_TRACKER.md#exact-next-task).

@@ -1,8 +1,8 @@
 # Progress tracker
 
-- **Current milestone:** Milestone 2 verified and complete. Milestone 3 is queued.
+- **Current milestone:** Milestone 3 verified and complete. Milestone 4 is queued.
 - **In progress:** None.
-- **Latest verified game commit:** `0d2db425c42685638036db44f446e9105d309618`.
+- **Latest verified game commit:** `6c1972beaf77877efff8724c23b5230d3e154fc6`.
 - **Last successful test:** 2026-11-20, LÖVE 11.5 launch with synthetic driving input on Linux Xvfb.
 - **Outstanding validation:** Manual playtesting, Windows 11 launch, and measured Windows frame rate.
 
@@ -12,7 +12,7 @@
 | --- | --- |
 | 1. Project foundation | COMPLETE — VERIFIED |
 | 2. Arcade marble physics | COMPLETE — VERIFIED |
-| 3. Checkpoints and lap management | NOT STARTED |
+| 3. Checkpoints and lap management | COMPLETE — VERIFIED |
 | 4. AI racing opponents | NOT STARTED |
 | 5. Kitchen table environment | NOT STARTED |
 | 6. Advanced track mechanics | NOT STARTED |
@@ -49,12 +49,18 @@
 - The playable build still has one marble. Multi-marble contacts were exercised
   in automated simulation. Manual gameplay and Windows 11 remain untested.
 
+## Milestone 3 verification
+
+- The circuit has three ordered directional checkpoints and a start/finish
+  stripe. Three valid laps finish the race. Recovery returns to the last valid
+  checkpoint and keeps lap progress.
+- All 16 physics checks, three race-rule check groups, the scripted three-lap
+  drive, and the LÖVE 11.5 Linux window smoke test passed.
+- Manual gameplay and Windows 11 remain untested.
+
 ## Exact next task
 
-Start Milestone 3 by defining finite, ordered checkpoint gates in
-`tracks/breakfast.lua` and adding a pure Lua race-progress module. Feed it the
-player's positions before and after each fixed simulation step. Accept forward
-crossings in order, count a lap at the start/finish line after all required
-gates, and finish after three valid laps. Keep recovery teleports out of the
-crossing checks. Add tests for a valid lap, reverse and out-of-order crossings,
-recovery, and the three-lap finish.
+Start Milestone 4 by defining a four-racer grid and clockwise waypoints in
+the track data. Give three AI marbles a waypoint controller and stuck recovery.
+Run them through the existing fixed-step physics and race rules, and verify
+that all three opponents can finish a three-lap race.
